@@ -26,7 +26,7 @@ public class LabelAdapter extends RecyclerView.Adapter<LabelAdapter.LabelViewHol
 
     @NonNull
     @Override
-    public LabelAdapter.LabelViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public LabelViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.labellist, parent, false);
         LabelViewHolder pvh = new LabelViewHolder(v);
         return pvh;

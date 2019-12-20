@@ -37,10 +37,9 @@ public class LabelListActivity extends AppCompatActivity {
 
         myDb = new DBHelper(this);
         //myDb.onUpgrade(myDb, 0, 0);
-        myDb.insertData("test1", null, 0);
+        //myDb.insertData("test1", null, 0);
 
-        LabelAdapter pa = new LabelAdapter(this, lp, myDb);
-        rv.setAdapter(pa);
+
 
         Cursor res = myDb.getAllData();
         if(res.getCount() == 0) {
@@ -53,7 +52,13 @@ public class LabelListActivity extends AppCompatActivity {
             lp.add(new Label(res.getString(0), null, 0));
             i++;
         }
-        
+
+
+
+        LabelAdapter pa = new LabelAdapter(this, lp, myDb);
+        rv.setAdapter(pa);
+
+
         addLabel.setOnClickListener(new CompoundButton.OnClickListener() {
             @Override
             public void onClick(View view) {
