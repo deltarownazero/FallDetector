@@ -38,20 +38,10 @@ public class LabelListActivity extends AppCompatActivity {
         myDb = new DBHelper(this);
         //myDb.onUpgrade(myDb, 0, 0);
         //myDb.insertData("test1", null, 0);
-
-
-
-        Cursor res = myDb.getAllData();
-        if(res.getCount() == 0) {
-            //error
-        }
-
         lp  = new ArrayList<>();
-        int i=0;
-        while(res.moveToNext()){
-            lp.add(new Label(res.getString(0), null, 0));
-            i++;
-        }
+        lp = getLabelList(lp, myDb);
+
+
 
 
 
@@ -81,7 +71,39 @@ public class LabelListActivity extends AppCompatActivity {
         });
     }
 
+    private List<Label> getLabelList(List<Label> lp, DBHelper myDb) {
+        lp.clear();
+        Cursor res = myDb.getAllData();
+        if(res.getCount() == 0) {
+            //error
+        }
+        int i=0;
+        while(res.moveToNext()){
+            lp.add(new Label(res.getString(0), null, false));
+
+            if(res.getInt(1)>0)
+                lp.get(i).setToDelete(true);
+            else
+                lp.get(i).setToDelete(false);
+            i++;
+        }
+    return lp;
+    }
+
     private void deleteChoosenLabel() {
+        String name;
+        lp = getLabelList(lp, myDb);
+        for(int i=0; i<lp.size(); i++) {
+            Label l = lp.get(i);
+            name = l.getName();
+            boolean x = l.getToDelete();
+            if(l.getToDelete()) {
+                myDb.deleteData(name);
+            }
+        }
+
+        LabelAdapter pa = new LabelAdapter(this, lp, myDb);
+        rv.setAdapter(pa);
     }
 
     private void goToUpdateLabelActivity() {

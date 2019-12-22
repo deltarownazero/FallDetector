@@ -5,9 +5,9 @@ import android.widget.ImageView;
 public class Label {
     private String name;
     private ImageView image;
-    private int toDelete;
+    private boolean toDelete;
 
-    public Label(String name, ImageView image, int toDelete) {
+    public Label(String name, ImageView image, boolean toDelete) {
         this.name = name;
         this.image = image;
         this.toDelete = toDelete;
@@ -29,11 +29,11 @@ public class Label {
         this.image = image;
     }
 
-    public int getToDelete() {
+    public boolean getToDelete() {
         return toDelete;
     }
 
-    public void setToDelete(int toDelete) {
+    public void setToDelete(boolean toDelete) {
         this.toDelete = toDelete;
     }
 }

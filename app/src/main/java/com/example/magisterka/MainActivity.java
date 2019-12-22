@@ -3,6 +3,7 @@ package com.example.magisterka;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -40,12 +41,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private String label;
     private Button changeLabel;
     private Intent changeLabelIntent;
+    private DBHelper myDb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        labelTxt = findViewById(R.id.label);
+
+        setLabel();
         changeLabel = findViewById(R.id.changeLabel);
         prevx=prevy=prevz=0;
         sum=0;
@@ -71,9 +74,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         chronometer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
             @Override
             public void onChronometerTick(Chronometer chronometer) {
-                if ((SystemClock.elapsedRealtime() - chronometer.getBase()) >= 3000) {
+                if ((SystemClock.elapsedRealtime() - chronometer.getBase()) >= 2000) {
                     //chronometer.setBase(SystemClock.elapsedRealtime());
-                    Toast.makeText(MainActivity.this, "Bing!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Send!", Toast.LENGTH_SHORT).show();
                     sendValue(sum);
                     sum=0;
                     prevx=prevy=prevz=0;
@@ -87,6 +90,18 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 goToChangeLabelActivity();
             }
         });
+    }
+
+    private void setLabel() {
+        labelTxt = findViewById(R.id.label);
+        myDb = new DBHelper(this);;
+        Cursor res = myDb.getAllData();
+        while(res.moveToNext()){
+            if(res.getInt(2)>0) {
+                labelTxt.setText(res.getString(0));
+                break;
+            }
+        }
     }
 
     private void goToChangeLabelActivity() {

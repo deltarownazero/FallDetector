@@ -12,10 +12,11 @@ public class DBHelper extends SQLiteOpenHelper {
 
     private static final int DB_VERSION = 1;
     public static final String DATABASE_NAME = "Label.db";
-    public static final String TABLE_NAME = "product_table2";
+    public static final String TABLE_NAME = "label_table";
     public static final String TABLE_CREATE = "CREATE TABLE "+TABLE_NAME+" (" +
             "NAME"+" TEXT, " +
             "TODELETE" +" INTEGER DEFAULT 0, "+
+            "CHOOSEN" + " INTEGER DEFAULT 0, "+
             "IMAGE"+" TEXT);";
 
     public DBHelper(@Nullable Context context) {
@@ -70,6 +71,14 @@ public class DBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put("TODELETE", toDelete);
+        db.update(TABLE_NAME, contentValues, "name=?", new String[]{name});
+        return true;
+    }
+    public boolean  setChoosen(int choosen, String name) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("CHOOSEN", choosen);
+        db.execSQL("UPDATE "+TABLE_NAME +" SET CHOOSEN=0 WHERE NAME is not null");
         db.update(TABLE_NAME, contentValues, "name=?", new String[]{name});
         return true;
     }
