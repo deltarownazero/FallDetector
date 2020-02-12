@@ -22,7 +22,7 @@ public class AddLabel extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.editlabel);
         save = findViewById(R.id.saveLabel);
-        uploadImage = findViewById(R.id.uploadImage);
+        //uploadImage = findViewById(R.id.uploadImage);
         name = findViewById(R.id.editName);
         description = findViewById(R.id.editDescription);
         image = findViewById(R.id.image);

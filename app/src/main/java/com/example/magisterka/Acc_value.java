@@ -2,12 +2,15 @@ package com.example.magisterka;
 
 public class Acc_value {
     private String currentTime, currentDate;
+    private double speed;
+
     private float value;
 
-    public Acc_value(String currentTime, String currentDate, float value) {
+    public Acc_value(String currentTime, String currentDate, float value, double speed) {
         this.currentTime = currentTime;
         this.value = value;
         this.currentDate = currentDate;
+        this.speed = speed;
     }
 
     public String getCurrentDate() {

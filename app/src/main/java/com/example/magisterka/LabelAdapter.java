@@ -85,8 +85,6 @@ public class LabelAdapter extends RecyclerView.Adapter<LabelAdapter.LabelViewHol
                 }
             });
 
-
-
         }
 
         @Override

@@ -13,16 +13,16 @@ import androidx.appcompat.app.AppCompatActivity;
 public class UpdateLabel extends AppCompatActivity {
     Button save, uploadImage;
     EditText name, description;
-    ImageView image;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.editlabel);
         save = findViewById(R.id.saveLabel);
-        uploadImage = findViewById(R.id.uploadImage);
+       // uploadImage = findViewById(R.id.uploadImage);
         name = findViewById(R.id.editName);
         description = findViewById(R.id.editDescription);
-        image = findViewById(R.id.image);
+
 
         save.setOnClickListener(new CompoundButton.OnClickListener() {
             @Override
@@ -31,17 +31,9 @@ public class UpdateLabel extends AppCompatActivity {
             }
         });
 
-        uploadImage.setOnClickListener(new CompoundButton.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                uploadImageLabel();
-            }
-        });
     }
 
     private void saveLabel() {
     }
 
-    private void uploadImageLabel() {
-    }
 }
