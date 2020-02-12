@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.Manifest.permission;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -14,6 +15,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -61,14 +63,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Button b;
     double distance = 0;
     double speed = 0;
-    private double prevLongitude=0, prevLatitude=0, longitude, latitude;
+    private double prevLongitude = 0, prevLatitude = 0, longitude, latitude;
     public final static double AVERAGE_RADIUS_OF_EARTH_KM = 6371;
-    int numberOfSend =0;
+    int numberOfSend = 0;
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
 
         setLabel();
         changeLabel = findViewById(R.id.changeLabel);
@@ -100,81 +103,57 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
         });
 
-
-
-        b = findViewById(R.id.location_button);
-        configure_button();
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        locationListener();
+        findLastLocation();
+        locationService();
     }
 
-    private void configure_button() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.INTERNET}
-                        , 10);
-            }
-            return;
-        }
-        // this code won't execute IF permissions are not allowed, because in the line above there is return statement.
-        b.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.M)
-            @Override
-            public void onClick(View view) {
-                //noinspection MissingPermission
-                if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.INTERNET}
-                                ,10);
-                    }
-                    return;
-                }
-                locationManager.requestLocationUpdates("gps", 50, 0, listener);
-            }
-        });
-    }
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode){
-            case 10:
-                configure_button();
-                break;
-            default:
-                break;
-        }
-    }
-    private void locationListener() {
+    @SuppressLint("MissingPermission")
+    private void locationService() {
 
-        locationText = findViewById(R.id.location);
-        speedText = findViewById(R.id.speed);
-        distanceText = findViewById(R.id.distance);
-        listener = new LocationListener() {
-
+        LocationListener locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                locationText.setText(String.valueOf((double) Math.round(location.getLongitude()*100)/100)+" "+String.valueOf((double) Math.round(location.getLatitude()*100)/100));
                 setLocation(location);
-                distanceText.setText(String.valueOf(getDistance())+" km");
-                speedText.setText(String.valueOf((double) Math.round(speed*100)/100)+" m/s");
             }
 
             @Override
-            public void onStatusChanged(String s, int i, Bundle bundle) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String s) {
+            public void onStatusChanged(String provider, int status, Bundle extras) {
 
             }
 
             @Override
-            public void onProviderDisabled(String s) {
+            public void onProviderEnabled(String provider) {
 
-                Intent i = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                startActivity(i);
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
             }
         };
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 90, 0, locationListener);
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10, 0, locationListener);
+    }
+
+
+    private void findLastLocation() {
+        Criteria criteria = new Criteria();
+        criteria.setAltitudeRequired(true);
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        criteria.setPowerRequirement(Criteria.NO_REQUIREMENT);
+        String provider = locationManager.getBestProvider(criteria, false);
+        if (checkSelfPermission(permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            System.out.println("error with permission");
+            return;
+        }else{
+            ActivityCompat.requestPermissions(this, new String[] {
+                    permission.ACCESS_FINE_LOCATION, permission.ACCESS_COARSE_LOCATION
+            }, 0);
+
+        }
+        Location location = locationManager.getLastKnownLocation(provider);
+        setLocation(location);
 
     }
 
@@ -187,8 +166,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             prevLatitude = latitude;
             prevLongitude = longitude;
         }
+
         latitude = location.getLatitude();
         longitude = location.getLongitude();
+        locationText = findViewById(R.id.location);
+        locationText.setText(String.valueOf((double) Math.round(location.getLongitude()*100)/100)+" "+String.valueOf((double) Math.round(location.getLatitude()*100)/100));
+        distanceText = findViewById(R.id.distance);
+        distanceText.setText(String.valueOf(getDistance())+" km");
+        speedText = findViewById(R.id.speed);
+        speedText.setText(String.valueOf((double) Math.round(speed*100)/100)+" m/s");
     }
 
 
@@ -209,6 +195,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         chronometer.setFormat("Time: %s");
         chronometer.setBase(SystemClock.elapsedRealtime());
         chronometer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onChronometerTick(Chronometer chronometer) {
                 if ((SystemClock.elapsedRealtime() - chronometer.getBase()) >= 2000) {
@@ -217,6 +204,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     sendValue(sum, getSpeed());
                     sum = 0;
                     prevx = prevy = prevz = 0;
+                    findLastLocation();
                 }
             }
         });
